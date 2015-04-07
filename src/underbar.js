@@ -97,7 +97,7 @@ _.reject = function(collection, test) {
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
     var duplicateFree = [];
-    _.each(array, function(item){
+    _.each(array, function(item, index){
       if(_.indexOf(duplicateFree, item) < 0){
         duplicateFree.push(item)
       }
@@ -109,7 +109,7 @@ _.reject = function(collection, test) {
   // Return the results of applying an iterator to each element.
   _.map = function(collection, iterator) {
     var array = [];
-    _.each(collection, function(item){
+    _.each(collection, function(item, index){
       array.push(iterator(item));
 
     })
@@ -158,7 +158,10 @@ _.reject = function(collection, test) {
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-        _.each(collection, function(item, index) {
+
+    // add condition to set accumulator if no explicit starting value is given.
+
+    _.each(collection, function(item, index) {
       if (accumulator === undefined) {
         accumulator = collection[0];
       }
@@ -169,7 +172,6 @@ _.reject = function(collection, test) {
 
     return accumulator;
   };
-
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
     // TIP: Many iteration problems can be most easily expressed in
@@ -185,13 +187,34 @@ _.reject = function(collection, test) {
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
-    // TIP: Try re-using reduce() here.
+    if(!iterator){
+    var iterator = _.identity;
+    }
+    var result = true;
+    _.each(collection, function(item){
+      if(!iterator(item)){
+        result = false;
+      }
+    })
+    return result;
   };
+     // TIP: Try re-using reduce() here.
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = function(collection, iterator) {
-    // TIP: There's a very clever way to re-use every() here.
+   _.some = function(collection, iterator) {
+    if (!iterator){
+       var iterator = _.identity;
+     }
+     var result = false;
+     _.each(collection, function(item) {
+       if (iterator(item)) {
+         result = true;
+       }
+
+     })
+     return result;
+  //   TIP: There's a very clever way to re-use every() here.
   };
 
 
@@ -214,11 +237,37 @@ _.reject = function(collection, test) {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var destination = obj;
+    var sources = [];
+    for(var i = 1; i < arguments.length; i++ ){
+      sources.push(arguments[i]);
+    }
+    
+    for(var i =0; i < sources.length; i++) {
+      for( var j in sources[i]){
+        destination[j] = sources[i][j];
+      }
+    }
+    return destination;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var destination = obj;
+    var sources = [];
+    
+    for(var i = 1; i < arguments.length; i++ ){
+      sources.push(arguments[i]);
+    }
+    for(var i =0; i < sources.length; i++) {
+      for( var j in sources[i]){
+        if (destination[j] === undefined) {
+          destination[j] = sources[i][j];
+        }
+      }
+    }
+    return destination;
   };
 
 
@@ -253,7 +302,7 @@ _.reject = function(collection, test) {
     };
   };
 
-  // Memorize an expensive function's results by storing them. You may assume
+  // Memoize an expensive function's results by storing them. You may assume
   // that the function takes only one argument and that it is a primitive.
   // memoize could be renamed to oncePerUniqueArgumentList; memoize does the
   // same thing as once, but based on many sets of unique arguments.
@@ -262,6 +311,16 @@ _.reject = function(collection, test) {
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var result = {};
+
+    return function() {
+      if (!result.hasOwnProperty(arguments[0])) {
+        
+        result[arguments[0]] = func.apply(this, arguments);
+        
+      }
+      return result[arguments[0]];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -271,6 +330,12 @@ _.reject = function(collection, test) {
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments, 2);
+    return setTimeout(function() {
+      return func.apply(this, args);
+    }, wait);
+
+
   };
 
 
@@ -285,6 +350,14 @@ _.reject = function(collection, test) {
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var shuffled = [];
+    for(var i = 0; i < array.length; i++){
+      var rand = Math.floor(Math.random(i));
+      shuffled.push(rand);
+    }
+    return shuffled;
+
+
   };
 
 
