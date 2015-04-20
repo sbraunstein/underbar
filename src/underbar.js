@@ -351,16 +351,40 @@ _.reject = function(collection, test) {
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
     var shuffled = [];
-    for(var i = 0; i < array.length; i++){
-      var rand = Math.floor(Math.random(i));
-      shuffled.push(rand);
+  _.each(array, function(item){
+    shuffled.push(item);
+  });
+  var m = shuffled.length;
+
+  // While there remain elements to shuffle…
+  while (m) {
+
+    // Pick a remaining element…
+    var i = Math.floor(Math.random() * m--);
+
+    // And swap it with the current element.
+    var t = shuffled[m];
+    shuffled[m] = shuffled[i];
+    shuffled[i] = t;
+  }
+
+  return shuffled;
+}
+
+function shuffle(array) {
+  var shuffled = [];
+  _.each(array, function(item){
+    shuffled.push(item);
+  })
+
+  for(var i = shuffled.length - 1; i >= 0; i--){
+    j = Math.floor(Math.random() * i);
+      temp = shuffled[j];
+      shuffled[j] = shuffled[i];
+      shuffled[i] == temp;
     }
     return shuffled;
-
-
-  };
-
-
+}
   /**
    * EXTRA CREDIT
    * =================
